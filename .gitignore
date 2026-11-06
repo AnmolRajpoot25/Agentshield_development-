@@ -1,0 +1,17 @@
+# Environment & Secrets
+.env
+credentials.json
+token.json
+*.pem
+*.key
+
+# Python & Caches
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# System
+.DS_Store
+Thumbs.db
+

@@ -1,0 +1,60 @@
+# ==============================================================================
+# AgentShield Configuration File
+# Multi-Turn AI Agent Security Auditing & Evaluation Framework
+# ==============================================================================
+
+app:
+  name: "AgentShield"
+  version: "1.0.0"
+  environment: "research"
+  seed: 42
+
+llm:
+  provider: "openrouter"
+  model: "nvidia/nemotron-3.5-lightning:free"
+  fallback_model: "meta-llama/llama-3.2-3b-instruct:free"
+  temperature: 0.0
+  max_tokens: 1024
+  request_timeout_seconds: 30
+  retry_attempts: 3
+  mock_mode_if_no_key: true
+
+security:
+  enforce_policy: true
+  allow_unregistered_tools: false
+  max_string_argument_length: 500
+  strict_type_checking: true
+  taint_boundary_enforcement: true
+  rbac_enabled: true
+  rlac_enabled: true
+  default_user_role: "analyst"
+  
+rbac:
+  roles:
+    anonymous:
+      allowed_tools: []
+      allowed_resource_levels: ["PUBLIC"]
+    viewer:
+      allowed_tools: ["search_documents", "summarize_document"]
+      allowed_resource_levels: ["PUBLIC"]
+    analyst:
+      allowed_tools: ["search_documents", "summarize_document", "read_document", "query_database"]
+      allowed_resource_levels: ["PUBLIC", "INTERNAL"]
+    admin:
+      allowed_tools: ["search_documents", "summarize_document", "read_document", "query_database", "send_email", "delete_records"]
+      allowed_resource_levels: ["PUBLIC", "INTERNAL", "CONFIDENTIAL", "RESTRICTED"]
+
+resources:
+  classification_levels:
+    - "PUBLIC"
+    - "INTERNAL"
+    - "CONFIDENTIAL"
+    - "RESTRICTED"
+
+evaluation:
+  benchmark_file: "datasets/adversarial/seed_scenarios.jsonl"
+  full_benchmark_file: "datasets/adversarial/full_benchmark.jsonl"
+  results_dir: "results"
+  traces_dir: "logs"
+  comparative_eval: true
+
