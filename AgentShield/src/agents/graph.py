@@ -6,6 +6,7 @@ from langgraph.graph import StateGraph, START, END
 
 from src.agents.llm import default_llm_client
 from src.agents.state import AgentState
+from src.guard.predict import inspect_interaction_risk
 from src.security.policies import policy_engine
 from src.security.taint import TaintTracker
 from src.tools.registry import execute_tool
@@ -196,6 +197,61 @@ def planner_node(state: AgentState) -> Dict[str, Any]:
             "total_tokens": resp.get("total_tokens", 0)
         },
         "cost": resp.get("cost", 0.0)
+    }
+
+
+# --------------------------------------------------
+# Node 2.5: ML Guard Evaluation (Advisory Risk Signal)
+# --------------------------------------------------
+def guard_evaluation_node(state: AgentState) -> Dict[str, Any]:
+    """
+    Evaluates multi-turn context and candidate tool proposal using AgentShield Guard.
+    CRITICAL: The Guard provides early risk telemetry only.
+    It does NOT authorize tool execution and CANNOT override policy engine decisions.
+    """
+    messages = list(state.get("messages", []))
+    user_request = state.get("user_request", "")
+    tool_name = state.get("tool_name")
+    tool_args = state.get("tool_args", {})
+    security_events = list(state.get("security_events", []))
+    untrusted_sources = list(state.get("untrusted_context_sources", []))
+
+    turns_for_guard = []
+    for msg in messages:
+        turns_for_guard.append({"role": msg.get("role", "user"), "text": msg.get("content", "")})
+
+    for src in untrusted_sources:
+        turns_for_guard.append({"role": "RETRIEVED_DOC", "source": "external", "classification": "INTERNAL", "text": src})
+
+    current_text = f"User Request: {user_request}"
+    if tool_name and str(tool_name).lower() not in ("none", "null"):
+        current_text += f"\nProposed Action: {tool_name}({tool_args})"
+    turns_for_guard.append({"role": "user", "text": current_text})
+
+    guard_res = inspect_interaction_risk(turns_for_guard)
+
+    if guard_res.get("predicted_label") == "adversarial":
+        security_events.append({
+            "event_type": "guard_adversarial_detected",
+            "risk_score": guard_res.get("risk_score"),
+            "attack_category": guard_res.get("attack_category"),
+            "threshold": guard_res.get("threshold"),
+            "model_version": guard_res.get("model_version"),
+            "inference_status": guard_res.get("inference_status")
+        })
+
+    log_event(
+        episode_id=state["episode_id"],
+        event_type="guard_evaluation",
+        payload={
+            "turn_number": state.get("turn_number", 1),
+            "guard_output": guard_res
+        }
+    )
+
+    return {
+        "guard_output": guard_res,
+        "security_events": security_events
     }
 
 
@@ -427,6 +483,7 @@ workflow = StateGraph(AgentState)
 
 workflow.add_node("input_boundary", input_boundary_node)
 workflow.add_node("planner", planner_node)
+workflow.add_node("guard_evaluation", guard_evaluation_node)
 workflow.add_node("policy_validation", policy_validation_node)
 workflow.add_node("execution", execution_node)
 workflow.add_node("document_analysis", document_analysis_node)
@@ -434,7 +491,8 @@ workflow.add_node("response_synthesis", response_synthesis_node)
 
 workflow.add_edge(START, "input_boundary")
 workflow.add_edge("input_boundary", "planner")
-workflow.add_edge("planner", "policy_validation")
+workflow.add_edge("planner", "guard_evaluation")
+workflow.add_edge("guard_evaluation", "policy_validation")
 workflow.add_edge("policy_validation", "execution")
 workflow.add_edge("execution", "document_analysis")
 workflow.add_edge("document_analysis", "response_synthesis")
@@ -491,6 +549,7 @@ def run_agent(
         "policy_decision": None,
         "tool_result": None,
         "security_events": [],
+        "guard_output": None,
         "final_response": None,
         "latency_ms": 0.0,
         "token_usage": {},

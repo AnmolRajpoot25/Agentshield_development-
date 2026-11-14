@@ -1,0 +1,26 @@
+{
+  "base_model_name": "distilbert-base-uncased",
+  "num_categories": 7,
+  "num_binary_classes": 2,
+  "max_seq_length": 128,
+  "dropout_prob": 0.2,
+  "learning_rate": 5e-05,
+  "batch_size": 16,
+  "epochs": 2,
+  "seed": 42,
+  "calibrated_threshold": 0.65,
+  "model_version": "v3.0.0-distilbert-multitask",
+  "category_map": {
+    "benign": 0,
+    "gradual_jailbreak": 1,
+    "indirect_prompt_injection": 2,
+    "tool_misuse": 3,
+    "context_poisoning": 4,
+    "false_authorization": 5,
+    "privilege_escalation": 6
+  },
+  "label_map": {
+    "benign": 0,
+    "adversarial": 1
+  }
+}

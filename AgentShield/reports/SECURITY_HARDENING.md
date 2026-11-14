@@ -340,3 +340,4 @@ AgentShield/tests/test_tools.py::test_execute_tool_unregistered_rejected PASSED 
 Milestone 2 has successfully hardened AgentShield's execution security boundary. The system no longer relies on model refusals: all tool execution requests are validated deterministically by an independent policy engine, and all state mutations are verified through snapshot diffing.
 
 All 37 unit and integration tests pass with 0 regressions. Milestone 2 is complete.
+

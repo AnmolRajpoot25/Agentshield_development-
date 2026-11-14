@@ -1,0 +1,78 @@
+{
+  "evaluation_timestamp": "2026-11-14T08:44:55.000241+00:00",
+  "model_version": "v3.0.0-distilbert-multitask",
+  "test_samples_count": 22,
+  "calibrated_threshold": 0.65,
+  "binary_intent": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "false_positive_rate": 0.0,
+    "false_negative_rate": 0.0,
+    "confusion_matrix": {
+      "true_negative": 4,
+      "false_positive": 0,
+      "false_negative": 0,
+      "true_positive": 18
+    }
+  },
+  "attack_category": {
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "weighted_f1": 1.0,
+    "per_category": {
+      "benign": {
+        "category_id": 0,
+        "support": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "gradual_jailbreak": {
+        "category_id": 1,
+        "support": 3,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "indirect_prompt_injection": {
+        "category_id": 2,
+        "support": 3,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "tool_misuse": {
+        "category_id": 3,
+        "support": 3,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "context_poisoning": {
+        "category_id": 4,
+        "support": 3,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "false_authorization": {
+        "category_id": 5,
+        "support": 3,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "privilege_escalation": {
+        "category_id": 6,
+        "support": 3,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    }
+  }
+}

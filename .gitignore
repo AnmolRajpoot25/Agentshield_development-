@@ -9,6 +9,12 @@ token.json
 
 build_*.py
 
+# Model Weights & Checkpoint Binaries (>100MB GitHub limit)
+*.bin
+*.safetensors
+*.pt
+*.pth
+
 # Python & Caches
 __pycache__/
 *.pyc

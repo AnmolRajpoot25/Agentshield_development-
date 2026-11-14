@@ -106,3 +106,4 @@ This section answers the 11 mandatory boundary verification questions using dire
 | **SEC-06** | `notebooks/AgentShield_Guard_Training.ipynb` | Entire notebook | Notebook contains code but no execution outputs or saved checkpoints | **Unsupported Claim:** Guard model cannot be claimed as an active defense without trained weights | Run training on GPU/CPU, save checkpoint artifacts, and log real metrics | **High (P1)** |
 | **SEC-07** | `src/evaluation/adjudicator.py` | `adjudicate_turn()` | Inspects return dict rather than environment state diff | **Adjudication Fragility:** An unauthorized state mutation could occur if tool return schema fails | Implement pre/post snapshot diffing of `DATABASE_TABLES` | **Medium (P2)** |
 | **SEC-08** | `src/tracing/logger.py` | `log_event()` | Writes to local file `logs/traces.jsonl` | Missing tamper-proof log export interface for benchmark reporting | Add structured JSON trace exporter | **Low (P3)** |
+

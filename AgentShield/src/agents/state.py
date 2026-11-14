@@ -34,6 +34,7 @@ class AgentState(TypedDict, total=False):
 
     # Security event telemetry
     security_events: List[Dict[str, Any]]
+    guard_output: Optional[Dict[str, Any]]
 
     # Synthesized final output
     final_response: Optional[str]
