@@ -1,0 +1,38 @@
+{
+  "collection_name": "AgentShield — AI Agent Security Evaluation",
+  "collection_slug": "agentshield-ai-agent-security-evaluation",
+  "description": "Comprehensive benchmark datasets, multi-turn adversarial attack scenarios, execution traces, and fine-tuned intent guardrails for auditing and enforcing security in tool-using AI agents.",
+  "hackathon_track": "Lexsi AI Safety Hackathon (Track 2a, Problem Statement 2a.3)",
+  "maintainer": "Anmol Rajpoot (rajpootanmol779@gmail.com)",
+  "license": "Apache-2.0 / MIT",
+  "items": [
+    {
+      "type": "model",
+      "repo_id": "agentshield-guard-distilbert",
+      "title": "AgentShield Guard DistilBERT Classifier",
+      "description": "Fine-tuned multi-task sequence classifier detecting multi-turn adversarial intent and 7 attack categories.",
+      "version": "v3.0.0"
+    },
+    {
+      "type": "dataset",
+      "repo_id": "agentshield-attack-benchmark",
+      "title": "AgentShield Multi-Turn Agent Attack Benchmark",
+      "description": "36-scenario canonical benchmark evaluating multi-turn agent attacks with observable side-effect adjudication.",
+      "version": "v4.0.0"
+    },
+    {
+      "type": "dataset",
+      "repo_id": "agentshield-guard-dataset",
+      "title": "AgentShield Guard Training & Evaluation Dataset",
+      "description": "398 multi-turn dialogues with leak-free train/validation/test partitions for adversarial intent classification.",
+      "version": "v3.0.0"
+    },
+    {
+      "type": "dataset",
+      "repo_id": "agentshield-synthetic-traces",
+      "title": "AgentShield Synthetic Agent Execution Traces",
+      "description": "Tamper-evident cryptographic audit logs with SHA-256 state hashes capturing agent state transitions and policy decisions.",
+      "version": "v2.0.0"
+    }
+  ]
+}

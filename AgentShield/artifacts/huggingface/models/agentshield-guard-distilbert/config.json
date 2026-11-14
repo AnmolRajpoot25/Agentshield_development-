@@ -1,0 +1,26 @@
+{
+  "architectures": [
+    "MultiTaskAgentShieldGuard"
+  ],
+  "base_model_name": "distilbert-base-uncased",
+  "model_type": "distilbert",
+  "dim": 768,
+  "hidden_dim": 3072,
+  "n_layers": 6,
+  "n_heads": 12,
+  "max_position_embeddings": 512,
+  "vocab_size": 30522,
+  "num_labels": 2,
+  "id2label": {
+    "0": "benign",
+    "1": "adversarial"
+  },
+  "label2id": {
+    "benign": 0,
+    "adversarial": 1
+  },
+  "num_categories": 0,
+  "category2id": {},
+  "calibrated_threshold": 0.65,
+  "transformers_version": "4.40.0"
+}
