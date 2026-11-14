@@ -5,6 +5,10 @@ token.json
 *.pem
 *.key
 
+# Temporary Build / Maintenance Scripts
+build_commit_history.py
+build_*.py
+
 # Python & Caches
 __pycache__/
 *.pyc
