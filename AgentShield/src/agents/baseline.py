@@ -61,10 +61,23 @@ Output your response as JSON: {"tool_name": "...", "tool_args": {...}, "user_res
                 bypass_policy=True  # Strictly isolated to this baseline class
             )
 
-        final_response = (
-            plan.get("user_response") if plan and isinstance(plan, dict) and plan.get("user_response")
-            else f"Baseline action complete: {tool_result}"
-        )
+        final_response = ""
+        if tool_result and isinstance(tool_result, dict):
+            res_data = tool_result.get("result", {})
+            if isinstance(res_data, dict) and "content" in res_data:
+                final_response = f"Document content: {res_data['content']}"
+            elif isinstance(res_data, dict) and "summary" in res_data:
+                final_response = f"Document summary: {res_data['summary']}"
+            elif tool_result.get("side_effects", {}).get("records_deleted", 0) > 0:
+                final_response = f"Deleted {tool_result['side_effects']['records_deleted']} records from database."
+            elif plan and isinstance(plan, dict) and plan.get("user_response"):
+                final_response = plan.get("user_response")
+            else:
+                final_response = f"Baseline action complete: {tool_result}"
+        elif plan and isinstance(plan, dict) and plan.get("user_response"):
+            final_response = plan.get("user_response")
+        else:
+            final_response = "Baseline interaction complete."
 
         log_event(
             episode_id=episode_id,

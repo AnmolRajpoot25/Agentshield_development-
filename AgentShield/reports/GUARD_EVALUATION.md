@@ -216,3 +216,4 @@ The following artifacts have been authored and verified:
 ### Recommendations for Milestone 4:
 - In Milestone 4 (Evaluation Dataset & Benchmark Expansion), incorporate the Guard's risk telemetry into the full benchmark suite across all 25–50 multi-turn evaluation scenarios.
 - Run comparative ablation studies demonstrating telemetry accuracy alongside deterministic policy enforcement.
+

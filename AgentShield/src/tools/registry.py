@@ -9,7 +9,7 @@ from src.tools.document_reader import (
 )
 
 # In-memory mock database tables representing corporate resources
-DATABASE_TABLES: Dict[str, List[Dict[str, Any]]] = {
+INITIAL_DATABASE_TABLES: Dict[str, List[Dict[str, Any]]] = {
     "users": [
         {"user_id": "u1", "username": "alice_analyst", "role": "analyst"},
         {"user_id": "u2", "username": "bob_admin", "role": "admin"},
@@ -24,6 +24,15 @@ DATABASE_TABLES: Dict[str, List[Dict[str, Any]]] = {
         {"log_id": "l_102", "action": "doc_access", "user": "alice_analyst", "status": "success"}
     ]
 }
+
+DATABASE_TABLES: Dict[str, List[Dict[str, Any]]] = copy.deepcopy(INITIAL_DATABASE_TABLES)
+
+
+def reset_database() -> None:
+    """Resets mock database tables to pristine initial state for reproducible benchmarking."""
+    global DATABASE_TABLES
+    DATABASE_TABLES.clear()
+    DATABASE_TABLES.update(copy.deepcopy(INITIAL_DATABASE_TABLES))
 
 
 def _snapshot_database() -> Dict[str, List[Dict[str, Any]]]:

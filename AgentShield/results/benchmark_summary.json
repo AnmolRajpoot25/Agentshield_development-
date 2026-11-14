@@ -1,0 +1,185 @@
+{
+  "overview": {
+    "total_episodes": 46,
+    "total_turns": 96,
+    "attack_episodes": 36,
+    "benign_episodes": 10,
+    "total_attack_turns": 45,
+    "unknown_episodes": 0
+  },
+  "security_metrics": {
+    "attack_success_rate": 0.0,
+    "unauthorized_execution_rate": 0.0,
+    "unauthorized_resource_access_rate": 0.0,
+    "unsafe_proposal_rate": 0.6222,
+    "policy_rejection_rate": 1.0,
+    "guard_detection_recall": 0.4167,
+    "unknown_outcome_rate": 0.0,
+    "denominators": {
+      "attack_success_rate": "total_attack_episodes",
+      "unauthorized_execution_rate": "total_attack_episodes",
+      "unauthorized_resource_access_rate": "total_attack_episodes",
+      "unsafe_proposal_rate": "total_attack_turns",
+      "policy_rejection_rate": "unsafe_model_proposals",
+      "guard_detection_recall": "total_attack_episodes"
+    }
+  },
+  "usability_metrics": {
+    "benign_task_success_rate": 0.9,
+    "benign_request_rejection_rate": 0.4,
+    "false_positive_rate": 0.4,
+    "task_completion_rate": 1.0,
+    "denominators": {
+      "benign_task_success_rate": "total_benign_episodes",
+      "benign_request_rejection_rate": "total_benign_episodes",
+      "false_positive_rate": "total_benign_episodes",
+      "task_completion_rate": "total_episodes"
+    }
+  },
+  "performance_metrics": {
+    "average_latency_ms": 443.72,
+    "median_latency_ms": 424.48,
+    "p95_latency_ms": 543.75,
+    "guard_inference_latency_ms": 0.03,
+    "token_usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "estimated_cost_usd": 0.0
+  },
+  "per_category_metrics": {
+    "gradual_jailbreak": {
+      "total_episodes": 4,
+      "attack_episodes": 4,
+      "benign_episodes": 0,
+      "attack_success_rate": 0.0,
+      "unauthorized_execution_rate": 0.0,
+      "guard_detection_recall": 0.75,
+      "policy_blocks": 3,
+      "unknown_outcomes": 0,
+      "benign_success_rate": 1.0
+    },
+    "indirect_prompt_injection": {
+      "total_episodes": 4,
+      "attack_episodes": 4,
+      "benign_episodes": 0,
+      "attack_success_rate": 0.0,
+      "unauthorized_execution_rate": 0.0,
+      "guard_detection_recall": 0.0,
+      "policy_blocks": 0,
+      "unknown_outcomes": 0,
+      "benign_success_rate": 1.0
+    },
+    "tool_misuse": {
+      "total_episodes": 4,
+      "attack_episodes": 4,
+      "benign_episodes": 0,
+      "attack_success_rate": 0.0,
+      "unauthorized_execution_rate": 0.0,
+      "guard_detection_recall": 0.5,
+      "policy_blocks": 4,
+      "unknown_outcomes": 0,
+      "benign_success_rate": 1.0
+    },
+    "context_poisoning": {
+      "total_episodes": 4,
+      "attack_episodes": 4,
+      "benign_episodes": 0,
+      "attack_success_rate": 0.0,
+      "unauthorized_execution_rate": 0.0,
+      "guard_detection_recall": 0.5,
+      "policy_blocks": 3,
+      "unknown_outcomes": 0,
+      "benign_success_rate": 1.0
+    },
+    "false_authorization": {
+      "total_episodes": 4,
+      "attack_episodes": 4,
+      "benign_episodes": 0,
+      "attack_success_rate": 0.0,
+      "unauthorized_execution_rate": 0.0,
+      "guard_detection_recall": 0.75,
+      "policy_blocks": 4,
+      "unknown_outcomes": 0,
+      "benign_success_rate": 1.0
+    },
+    "benign": {
+      "total_episodes": 5,
+      "attack_episodes": 0,
+      "benign_episodes": 5,
+      "attack_success_rate": 0.0,
+      "unauthorized_execution_rate": 0.0,
+      "guard_detection_recall": 0.0,
+      "policy_blocks": 0,
+      "unknown_outcomes": 0,
+      "benign_success_rate": 1.0
+    },
+    "direct_jailbreak": {
+      "total_episodes": 3,
+      "attack_episodes": 3,
+      "benign_episodes": 0,
+      "attack_success_rate": 0.0,
+      "unauthorized_execution_rate": 0.0,
+      "guard_detection_recall": 0.6667,
+      "policy_blocks": 3,
+      "unknown_outcomes": 0,
+      "benign_success_rate": 1.0
+    },
+    "privilege_escalation": {
+      "total_episodes": 4,
+      "attack_episodes": 4,
+      "benign_episodes": 0,
+      "attack_success_rate": 0.0,
+      "unauthorized_execution_rate": 0.0,
+      "guard_detection_recall": 0.25,
+      "policy_blocks": 3,
+      "unknown_outcomes": 0,
+      "benign_success_rate": 1.0
+    },
+    "unauthorized_resource_access": {
+      "total_episodes": 3,
+      "attack_episodes": 3,
+      "benign_episodes": 0,
+      "attack_success_rate": 0.0,
+      "unauthorized_execution_rate": 0.0,
+      "guard_detection_recall": 0.0,
+      "policy_blocks": 2,
+      "unknown_outcomes": 0,
+      "benign_success_rate": 1.0
+    },
+    "malicious_tool_output": {
+      "total_episodes": 3,
+      "attack_episodes": 3,
+      "benign_episodes": 0,
+      "attack_success_rate": 0.0,
+      "unauthorized_execution_rate": 0.0,
+      "guard_detection_recall": 0.0,
+      "policy_blocks": 0,
+      "unknown_outcomes": 0,
+      "benign_success_rate": 1.0
+    },
+    "multi_turn_instruction_manipulation": {
+      "total_episodes": 3,
+      "attack_episodes": 3,
+      "benign_episodes": 0,
+      "attack_success_rate": 0.0,
+      "unauthorized_execution_rate": 0.0,
+      "guard_detection_recall": 0.6667,
+      "policy_blocks": 3,
+      "unknown_outcomes": 0,
+      "benign_success_rate": 1.0
+    },
+    "benign_hard_negatives": {
+      "total_episodes": 5,
+      "attack_episodes": 0,
+      "benign_episodes": 5,
+      "attack_success_rate": 0.0,
+      "unauthorized_execution_rate": 0.0,
+      "guard_detection_recall": 0.0,
+      "policy_blocks": 0,
+      "unknown_outcomes": 0,
+      "benign_success_rate": 0.8
+    }
+  }
+}
