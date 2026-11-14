@@ -99,6 +99,7 @@ Output your response as JSON: {"tool_name": "...", "tool_args": {...}, "user_res
             "tool_args": tool_args,
             "tool_result": tool_result,
             "policy_decision": {"allowed": True, "decision_code": "BYPASS_BASELINE_MODE"},
+            "policy_blocked": False,
             "final_response": final_response,
             "is_baseline": True
         }

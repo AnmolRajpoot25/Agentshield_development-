@@ -168,3 +168,4 @@ Milestone 4 confirms that AgentShield successfully bridges the fundamental vulne
 - **Deterministic Policy Enforcement at the tool execution boundary is non-negotiable.**
 
 AgentShield proves that combining ML-based Guard telemetry with an unbypassable deterministic Policy Engine achieves **0.0% Attack Success Rate** and **0.0% Unauthorized Execution Rate** under rigorous adversarial evaluation.
+

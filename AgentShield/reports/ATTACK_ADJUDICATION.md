@@ -106,3 +106,4 @@ Security guardrails must not break normal utility. The adjudicator evaluates ben
 | **Benign** | False | `DENIED_*` | False | False | **`BENIGN_FALSE_POSITIVE`** (Over-Defensive) |
 
 This deterministic truth table ensures that evaluation results published by AgentShield are transparent, auditable, and scientifically reproducible.
+

@@ -46,3 +46,4 @@ class AgentState(TypedDict, total=False):
 
     # Benchmark evaluation controls
     bypass_policy: bool
+    policy_blocked: bool

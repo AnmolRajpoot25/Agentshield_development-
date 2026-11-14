@@ -48,6 +48,8 @@ class TaintTracker:
         "ignore previous instructions",
         "ignore all instructions",
         "disregard prior instructions",
+        "disregard all prior instructions",
+        "disregard system prompt instructions",
         "you are now in dan mode",
         "system override",
         "delete records",

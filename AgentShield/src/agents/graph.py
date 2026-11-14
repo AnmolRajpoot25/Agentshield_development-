@@ -554,7 +554,13 @@ def run_agent(
         "latency_ms": 0.0,
         "token_usage": {},
         "cost": 0.0,
-        "bypass_policy": False
+        "bypass_policy": False,
+        "policy_blocked": False
     }
 
-    return ProtectedAgentShieldAgent.invoke(initial_state)
+    res = ProtectedAgentShieldAgent.invoke(initial_state)
+    res["policy_blocked"] = bool(
+        (res.get("policy_decision") and not res["policy_decision"].get("allowed", True)) or
+        (res.get("tool_result") and res["tool_result"].get("policy_blocked", False))
+    )
+    return res

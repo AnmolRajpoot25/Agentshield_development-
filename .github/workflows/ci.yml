@@ -1,0 +1,51 @@
+name: AgentShield CI / Security Regression Pipeline
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  security-tests:
+    name: Automated Security Invariants & Unit Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r AgentShield/requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Verify pristine configuration & syntax
+        run: |
+          python -m py_compile $(find AgentShield/src -name "*.py")
+
+      - name: Run Full Test Suite with Coverage
+        run: |
+          python -m pytest AgentShield/tests -v --cov=AgentShield/src --cov-report=term --cov-report=xml:coverage.xml
+
+      - name: Run Adversarial Security Regression Suite
+        run: |
+          python AgentShield/run_tests.py --suite adversarial
+
+      - name: Upload Test Coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report-py${{ matrix.python-version }}
+          path: coverage.xml
+

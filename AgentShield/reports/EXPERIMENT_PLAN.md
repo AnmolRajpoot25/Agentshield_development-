@@ -140,3 +140,4 @@ Visualizations will be exported to `reports/figures/` (PNG, 300 DPI):
 - `reports/figures/ablation_study.png`
 
 Comprehensive analysis will be compiled in `reports/COMPARATIVE_EXPERIMENTS.md`.
+

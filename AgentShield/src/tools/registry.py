@@ -233,39 +233,39 @@ class SecureToolGateway:
         session_context = session_context or {"user_role": "analyst", "user_id": "u1"}
         untrusted_sources = untrusted_sources or []
 
-        # 1-6. Independent Policy Engine Authorization Gate
-        decision = policy_engine.evaluate(
-            tool_name=tool_name,
-            tool_args=arguments,
-            session_context=session_context,
-            untrusted_sources=untrusted_sources
-        )
-
-        if not decision.allowed:
-            return {
-                "success": False,
-                "error": f"Authorization Denied [{decision.decision_code}]: {decision.reason}",
-                "decision_code": decision.decision_code,
-                "policy_id": decision.policy_id,
-                "policy_blocked": True,
-                "side_effects": {"has_state_mutation": False, "records_deleted": 0}
-            }
-
-        # Step 7: Tool Existence Verification in registry
-        tool_func = TOOL_REGISTRY.get(tool_name)
-        if tool_func is None:
-            return {
-                "success": False,
-                "error": f"Unknown tool: '{tool_name}'",
-                "decision_code": "DENIED_UNREGISTERED_TOOL",
-                "policy_blocked": True,
-                "side_effects": {"has_state_mutation": False, "records_deleted": 0}
-            }
-
-        # Step 8: Execution with Snapshot Side-Effect Auditing
-        before_state = _snapshot_database()
-
         try:
+            # 1-6. Independent Policy Engine Authorization Gate
+            decision = policy_engine.evaluate(
+                tool_name=tool_name,
+                tool_args=arguments,
+                session_context=session_context,
+                untrusted_sources=untrusted_sources
+            )
+
+            if not decision.allowed:
+                return {
+                    "success": False,
+                    "error": f"Authorization Denied [{decision.decision_code}]: {decision.reason}",
+                    "decision_code": decision.decision_code,
+                    "policy_id": decision.policy_id,
+                    "policy_blocked": True,
+                    "side_effects": {"has_state_mutation": False, "records_deleted": 0}
+                }
+
+            # Step 7: Tool Existence Verification in registry
+            tool_func = TOOL_REGISTRY.get(tool_name)
+            if tool_func is None:
+                return {
+                    "success": False,
+                    "error": f"Unknown tool: '{tool_name}'",
+                    "decision_code": "DENIED_UNREGISTERED_TOOL",
+                    "policy_blocked": True,
+                    "side_effects": {"has_state_mutation": False, "records_deleted": 0}
+                }
+
+            # Step 8: Execution with Snapshot Side-Effect Auditing
+            before_state = _snapshot_database()
+
             # Special case: pass user_role to search_documents for clearance filtering
             if tool_name == "search_documents":
                 exec_args = dict(arguments)
@@ -292,7 +292,7 @@ class SecureToolGateway:
                 "success": False,
                 "error": f"Invalid arguments supplied to tool: {str(te)}",
                 "decision_code": "INVALID_ARGUMENT_ERROR",
-                "policy_blocked": False,
+                "policy_blocked": True,
                 "side_effects": {"has_state_mutation": False, "records_deleted": 0}
             }
         except Exception as exc:
@@ -300,7 +300,7 @@ class SecureToolGateway:
                 "success": False,
                 "error": f"Execution error: {str(exc)}",
                 "decision_code": "EXECUTION_EXCEPTION",
-                "policy_blocked": False,
+                "policy_blocked": True,
                 "side_effects": {"has_state_mutation": False, "records_deleted": 0}
             }
 
