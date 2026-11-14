@@ -103,8 +103,17 @@ class SecurityPolicyEngine:
     Resource-Level Access Control (RLAC Default-Deny), and Dynamic Taint Invariants.
     """
 
-    def __init__(self, default_role: str = "analyst"):
+    def __init__(
+        self,
+        default_role: str = "analyst",
+        enable_rbac: bool = True,
+        enable_rlac: bool = True,
+        enable_taint: bool = True
+    ):
         self.default_role = default_role
+        self.enable_rbac = enable_rbac
+        self.enable_rlac = enable_rlac
+        self.enable_taint = enable_taint
 
     def authorize(
         self,
@@ -275,7 +284,7 @@ class SecurityPolicyEngine:
         # ---------------------------------------------------------
         # Check 5: Role-Based Access Control (RBAC)
         # ---------------------------------------------------------
-        if not RolePermissionMatrix.is_tool_permitted(user_role, action):
+        if self.enable_rbac and not RolePermissionMatrix.is_tool_permitted(user_role, action):
             return PolicyDecision(
                 decision="DENY",
                 allowed=False,
@@ -295,7 +304,7 @@ class SecurityPolicyEngine:
         # ---------------------------------------------------------
         resolved_resource = resource or arguments.get("document_id") or arguments.get("table") or arguments.get("record_id")
         
-        if resolved_resource:
+        if self.enable_rlac and resolved_resource:
             res_str = str(resolved_resource).strip()
             
             # Fail-Closed Rule (SEC-01): Unknown resources MUST be denied by default!
@@ -334,40 +343,41 @@ class SecurityPolicyEngine:
         # ---------------------------------------------------------
         # Check 7: Dynamic Taint Propagation Check (SEC-03)
         # ---------------------------------------------------------
-        is_tainted, taint_reason = TaintTracker.is_tainted_by_untrusted_source(action, arguments, untrusted_sources)
-        if is_tainted:
-            return PolicyDecision(
-                decision="DENY",
-                allowed=False,
-                decision_code="DENIED_TAINT_PROPAGATION",
-                policy_id="POL-TAINT-001",
-                reason=f"Adversarial taint propagation detected: {taint_reason}",
-                subject=subject_record,
-                action=action,
-                resource=resolved_resource,
-                context=context,
-                timestamp=timestamp,
-                details={"taint_reason": taint_reason}
-            )
+        if self.enable_taint:
+            is_tainted, taint_reason = TaintTracker.is_tainted_by_untrusted_source(action, arguments, untrusted_sources)
+            if is_tainted:
+                return PolicyDecision(
+                    decision="DENY",
+                    allowed=False,
+                    decision_code="DENIED_TAINT_PROPAGATION",
+                    policy_id="POL-TAINT-001",
+                    reason=f"Adversarial taint propagation detected: {taint_reason}",
+                    subject=subject_record,
+                    action=action,
+                    resource=resolved_resource,
+                    context=context,
+                    timestamp=timestamp,
+                    details={"taint_reason": taint_reason}
+                )
 
-        # Static argument marker check
-        for k, v in arguments.items():
-            if isinstance(v, str):
-                injections = TaintTracker.scan_for_injection_markers(v)
-                if injections:
-                    return PolicyDecision(
-                        decision="DENY",
-                        allowed=False,
-                        decision_code="DENIED_TAINTED_ARGUMENT",
-                        policy_id="POL-TAINT-002",
-                        reason=f"Adversarial injection tokens detected in parameter '{k}': {injections}",
-                        subject=subject_record,
-                        action=action,
-                        resource=resolved_resource,
-                        context=context,
-                        timestamp=timestamp,
-                        details={"param": k, "markers": injections}
-                    )
+            # Static argument marker check
+            for k, v in arguments.items():
+                if isinstance(v, str):
+                    injections = TaintTracker.scan_for_injection_markers(v)
+                    if injections:
+                        return PolicyDecision(
+                            decision="DENY",
+                            allowed=False,
+                            decision_code="DENIED_TAINTED_ARGUMENT",
+                            policy_id="POL-TAINT-002",
+                            reason=f"Adversarial injection tokens detected in parameter '{k}': {injections}",
+                            subject=subject_record,
+                            action=action,
+                            resource=resolved_resource,
+                            context=context,
+                            timestamp=timestamp,
+                            details={"param": k, "markers": injections}
+                        )
 
         # ---------------------------------------------------------
         # All Invariants Satisfied: ALLOW

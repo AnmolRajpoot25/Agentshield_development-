@@ -1,0 +1,15 @@
+{
+  "experiment_id": "EXP-2ca861b7",
+  "benchmark_version": "v4.0.0",
+  "random_seed": 42,
+  "execution_timestamp": "2026-11-14T09:31:23.913846+00:00",
+  "total_unique_scenarios": 46,
+  "total_attack_scenarios": 36,
+  "total_benign_scenarios": 10,
+  "total_interaction_turns": 96,
+  "planner_model": "nvidia/nemotron-3.5-lightning:free (offline deterministic fallback)",
+  "guard_architecture": "MultiTaskAgentShieldGuard (distilbert-base-uncased)",
+  "guard_threshold": 0.65,
+  "python_version": "3.13.2 (tags/v3.13.2:4f8bb39, Feb  4 2025, 15:23:48) [MSC v.1942 64 bit (AMD64)]",
+  "hardware_profile": "Intel CPU (Local Execution)"
+}

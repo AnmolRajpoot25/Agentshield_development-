@@ -1,0 +1,186 @@
+{
+  "Vulnerable Baseline": {
+    "attack_success_rate": 0.6111,
+    "asr_ci": {
+      "estimate": 0.6111,
+      "ci_lower": 0.4486,
+      "ci_upper": 0.7522
+    },
+    "unauthorized_execution_rate": 0.6389,
+    "uer_ci": {
+      "estimate": 0.6389,
+      "ci_lower": 0.4757,
+      "ci_upper": 0.7752
+    },
+    "unauthorized_resource_access_rate": 0.6389,
+    "unsafe_proposal_rate": 0.6222,
+    "policy_rejection_rate": 0.0,
+    "guard_detection_recall": 0.0,
+    "benign_task_success_rate": 1.0,
+    "btsr_ci": {
+      "estimate": 1.0,
+      "ci_lower": 0.7225,
+      "ci_upper": 1.0
+    },
+    "false_positive_rate": 0.0,
+    "fpr_ci": {
+      "estimate": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.2775
+    },
+    "task_completion_rate": 1.0,
+    "benign_request_rejection_rate": 0.0,
+    "unknown_outcome_rate": 0.0,
+    "average_latency_ms": 0.0,
+    "median_latency_ms": 0.0,
+    "p95_latency_ms": 0.0,
+    "guard_inference_latency_ms": 0.0,
+    "estimated_cost_usd": 0.0,
+    "denominators": {
+      "attack_success_rate": "total_attack_episodes",
+      "unauthorized_execution_rate": "total_attack_episodes",
+      "unauthorized_resource_access_rate": "total_attack_episodes",
+      "unsafe_proposal_rate": "total_attack_turns",
+      "policy_rejection_rate": "unsafe_model_proposals",
+      "guard_detection_recall": "total_attack_episodes"
+    }
+  },
+  "Guard Only": {
+    "attack_success_rate": 0.6111,
+    "asr_ci": {
+      "estimate": 0.6111,
+      "ci_lower": 0.4486,
+      "ci_upper": 0.7522
+    },
+    "unauthorized_execution_rate": 0.6389,
+    "uer_ci": {
+      "estimate": 0.6389,
+      "ci_lower": 0.4757,
+      "ci_upper": 0.7752
+    },
+    "unauthorized_resource_access_rate": 0.6389,
+    "unsafe_proposal_rate": 0.6222,
+    "policy_rejection_rate": 0.0,
+    "guard_detection_recall": 0.3333,
+    "benign_task_success_rate": 1.0,
+    "btsr_ci": {
+      "estimate": 1.0,
+      "ci_lower": 0.7225,
+      "ci_upper": 1.0
+    },
+    "false_positive_rate": 0.0,
+    "fpr_ci": {
+      "estimate": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.2775
+    },
+    "task_completion_rate": 1.0,
+    "benign_request_rejection_rate": 0.0,
+    "unknown_outcome_rate": 0.0,
+    "average_latency_ms": 0.0,
+    "median_latency_ms": 0.0,
+    "p95_latency_ms": 0.0,
+    "guard_inference_latency_ms": 0.03,
+    "estimated_cost_usd": 0.0,
+    "denominators": {
+      "attack_success_rate": "total_attack_episodes",
+      "unauthorized_execution_rate": "total_attack_episodes",
+      "unauthorized_resource_access_rate": "total_attack_episodes",
+      "unsafe_proposal_rate": "total_attack_turns",
+      "policy_rejection_rate": "unsafe_model_proposals",
+      "guard_detection_recall": "total_attack_episodes"
+    }
+  },
+  "Policy Only": {
+    "attack_success_rate": 0.0,
+    "asr_ci": {
+      "estimate": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0964
+    },
+    "unauthorized_execution_rate": 0.0,
+    "uer_ci": {
+      "estimate": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0964
+    },
+    "unauthorized_resource_access_rate": 0.0,
+    "unsafe_proposal_rate": 0.6222,
+    "policy_rejection_rate": 1.0,
+    "guard_detection_recall": 0.0,
+    "benign_task_success_rate": 0.9,
+    "btsr_ci": {
+      "estimate": 0.9,
+      "ci_lower": 0.5958,
+      "ci_upper": 0.9821
+    },
+    "false_positive_rate": 0.4,
+    "fpr_ci": {
+      "estimate": 0.4,
+      "ci_lower": 0.1682,
+      "ci_upper": 0.6873
+    },
+    "task_completion_rate": 1.0,
+    "benign_request_rejection_rate": 0.4,
+    "unknown_outcome_rate": 0.0,
+    "average_latency_ms": 465.97,
+    "median_latency_ms": 438.65,
+    "p95_latency_ms": 713.96,
+    "guard_inference_latency_ms": 0.0,
+    "estimated_cost_usd": 0.0,
+    "denominators": {
+      "attack_success_rate": "total_attack_episodes",
+      "unauthorized_execution_rate": "total_attack_episodes",
+      "unauthorized_resource_access_rate": "total_attack_episodes",
+      "unsafe_proposal_rate": "total_attack_turns",
+      "policy_rejection_rate": "unsafe_model_proposals",
+      "guard_detection_recall": "total_attack_episodes"
+    }
+  },
+  "Combined AgentShield": {
+    "attack_success_rate": 0.0,
+    "asr_ci": {
+      "estimate": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0964
+    },
+    "unauthorized_execution_rate": 0.0,
+    "uer_ci": {
+      "estimate": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0964
+    },
+    "unauthorized_resource_access_rate": 0.0,
+    "unsafe_proposal_rate": 0.6222,
+    "policy_rejection_rate": 1.0,
+    "guard_detection_recall": 0.4167,
+    "benign_task_success_rate": 0.9,
+    "btsr_ci": {
+      "estimate": 0.9,
+      "ci_lower": 0.5958,
+      "ci_upper": 0.9821
+    },
+    "false_positive_rate": 0.4,
+    "fpr_ci": {
+      "estimate": 0.4,
+      "ci_lower": 0.1682,
+      "ci_upper": 0.6873
+    },
+    "task_completion_rate": 1.0,
+    "benign_request_rejection_rate": 0.4,
+    "unknown_outcome_rate": 0.0,
+    "average_latency_ms": 443.72,
+    "median_latency_ms": 424.48,
+    "p95_latency_ms": 543.75,
+    "guard_inference_latency_ms": 0.03,
+    "estimated_cost_usd": 0.0,
+    "denominators": {
+      "attack_success_rate": "total_attack_episodes",
+      "unauthorized_execution_rate": "total_attack_episodes",
+      "unauthorized_resource_access_rate": "total_attack_episodes",
+      "unsafe_proposal_rate": "total_attack_turns",
+      "policy_rejection_rate": "unsafe_model_proposals",
+      "guard_detection_recall": "total_attack_episodes"
+    }
+  }
+}
