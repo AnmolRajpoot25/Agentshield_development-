@@ -1,10 +1,10 @@
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Tuple
 from src.security.rbac import RolePermissionMatrix
 from src.security.taint import TaintTracker
 
-# Allowed registered tools
+# Authorized registered tools
 ALLOWED_TOOLS: Set[str] = {
     "search_documents",
     "summarize_document",
@@ -14,20 +14,26 @@ ALLOWED_TOOLS: Set[str] = {
     "delete_records"
 }
 
-# Resource Sensitivity Metadata Catalog (RLAC)
-RESOURCE_CLASSIFICATION: Dict[str, str] = {
+# Explicit Resource Sensitivity Catalog (RLAC)
+# Every recognized resource is assigned a strict sensitivity classification tier.
+RESOURCE_REGISTRY: Dict[str, str] = {
+    # Documents
     "invoice_001": "INTERNAL",
     "policy_001": "PUBLIC",
     "quarterly_report_002": "INTERNAL",
     "confidential_payroll_002": "CONFIDENTIAL",
     "employee_records_confidential": "CONFIDENTIAL",
     "admin_credentials_004": "RESTRICTED",
-    "vendor_security_report_malicious_003": "CONFIDENTIAL",
-    "malicious_doc_001": "CONFIDENTIAL",
-    "malicious_doc_002": "CONFIDENTIAL",
-    "malicious_doc_003": "CONFIDENTIAL"
+    "malicious_doc_001": "INTERNAL",
+    "malicious_doc_002": "INTERNAL",
+    "malicious_doc_003": "PUBLIC",
+    # Database Tables
+    "invoices": "INTERNAL",
+    "users": "CONFIDENTIAL",
+    "audit_logs": "RESTRICTED"
 }
 
+# Strict Parameter Schemas
 TOOL_SCHEMAS: Dict[str, Dict[str, Any]] = {
     "search_documents": {
         "required": ["query"],
@@ -70,13 +76,21 @@ TOOL_SCHEMAS: Dict[str, Dict[str, Any]] = {
 
 @dataclass
 class PolicyDecision:
-    allowed: bool
-    decision_code: str
-    reason: str
-    tool_name: Optional[str]
-    user_role: str
-    timestamp: str
-    details: Dict[str, Any]
+    """
+    Structured authorization decision returned by the independent Security Policy Engine.
+    Follows: authorize(subject, action, resource, context) -> PolicyDecision.
+    """
+    decision: str          # "ALLOW", "DENY", "INVALID_REQUEST"
+    allowed: bool          # True if "ALLOW", False otherwise
+    decision_code: str     # Machine-readable reason code
+    policy_id: str         # Deterministic policy rule identifier
+    reason: str            # Human-readable rationale
+    subject: Dict[str, Any]# Caller identity & verified role
+    action: Optional[str]  # Requested tool name
+    resource: Optional[str]# Target resource identifier
+    context: Dict[str, Any]# Environment / session context
+    timestamp: str         # ISO 8601 UTC timestamp
+    details: Dict[str, Any]# Telemetry diagnostic details
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -85,113 +99,159 @@ class PolicyDecision:
 class SecurityPolicyEngine:
     """
     Independent External Security Policy Engine for AgentShield.
-    Enforces Tool Allowlisting, Strict Schema Validation, RBAC,
-    Resource-Level Access Control (RLAC), Taint Boundaries, and
-    Context-Poisoning Invariants.
+    Enforces Tool Allowlisting, Strict Parameter Schemas, Role-Based Access Control (RBAC),
+    Resource-Level Access Control (RLAC Default-Deny), and Dynamic Taint Invariants.
     """
 
     def __init__(self, default_role: str = "analyst"):
         self.default_role = default_role
 
-    def evaluate(
+    def authorize(
         self,
-        tool_name: Optional[str],
-        tool_args: Dict[str, Any],
-        session_context: Optional[Dict[str, Any]] = None,
-        state_history: Optional[List[Dict[str, Any]]] = None
+        subject: Dict[str, Any],
+        action: Optional[str],
+        resource: Optional[str] = None,
+        context: Optional[Dict[str, Any]] = None,
+        arguments: Optional[Dict[str, Any]] = None,
+        untrusted_sources: Optional[List[str]] = None
     ) -> PolicyDecision:
+        """
+        Centralized enterprise authorization decision interface:
+        authorize(subject, action, resource, context) -> PolicyDecision
+        """
         timestamp = datetime.now(timezone.utc).isoformat()
-        session_context = session_context or {}
-        user_role = session_context.get("user_role", self.default_role)
+        context = context or {}
+        arguments = arguments if arguments is not None else {}
+        untrusted_sources = untrusted_sources or []
 
-        # 1. Null / None tool handling
-        if not tool_name or tool_name.lower() in ("none", "null"):
+        user_role = str(subject.get("user_role", self.default_role)).lower()
+        user_id = str(subject.get("user_id", "unknown_user"))
+        subject_record = {"user_id": user_id, "user_role": user_role}
+
+        # ---------------------------------------------------------
+        # Check 1: Null / None tool proposal handling
+        # ---------------------------------------------------------
+        if not action or action.lower() in ("none", "null"):
             return PolicyDecision(
+                decision="ALLOW",
                 allowed=True,
                 decision_code="NO_TOOL_PROPOSED",
-                reason="No tool operation requested.",
-                tool_name=None,
-                user_role=user_role,
+                policy_id="POL-NO-OP",
+                reason="No active tool operation requested.",
+                subject=subject_record,
+                action=None,
+                resource=None,
+                context=context,
                 timestamp=timestamp,
                 details={}
             )
 
-        # 2. Tool Allowlisting Check
-        if tool_name not in ALLOWED_TOOLS:
+        # ---------------------------------------------------------
+        # Check 2: Tool Allowlisting Check
+        # ---------------------------------------------------------
+        if action not in ALLOWED_TOOLS:
             return PolicyDecision(
+                decision="DENY",
                 allowed=False,
                 decision_code="DENIED_UNREGISTERED_TOOL",
-                reason=f"Tool '{tool_name}' is not in the authorized tool allowlist.",
-                tool_name=tool_name,
-                user_role=user_role,
+                policy_id="POL-TOOL-ALLOWLIST",
+                reason=f"Tool '{action}' is not in the authorized tool allowlist.",
+                subject=subject_record,
+                action=action,
+                resource=resource,
+                context=context,
                 timestamp=timestamp,
-                details={"attempted_tool": tool_name}
+                details={"attempted_tool": action}
             )
 
-        # 3. Arguments dictionary validation
-        if not isinstance(tool_args, dict):
+        # ---------------------------------------------------------
+        # Check 3: Arguments structure validation
+        # ---------------------------------------------------------
+        if not isinstance(arguments, dict):
             return PolicyDecision(
+                decision="INVALID_REQUEST",
                 allowed=False,
                 decision_code="DENIED_INVALID_ARGUMENT_STRUCTURE",
+                policy_id="POL-SCHEMA-FORMAT",
                 reason="Tool arguments must be supplied as a valid JSON dictionary.",
-                tool_name=tool_name,
-                user_role=user_role,
+                subject=subject_record,
+                action=action,
+                resource=resource,
+                context=context,
                 timestamp=timestamp,
-                details={"arguments_type": type(tool_args).__name__}
+                details={"arguments_type": type(arguments).__name__}
             )
 
-        # 4. Schema & Parameter Validation
-        schema = TOOL_SCHEMAS.get(tool_name)
+        # ---------------------------------------------------------
+        # Check 4: Schema & Parameter Validation
+        # ---------------------------------------------------------
+        schema = TOOL_SCHEMAS.get(action)
         if schema:
             # Check required parameters
             for req in schema["required"]:
-                if req not in tool_args:
+                if req not in arguments:
                     return PolicyDecision(
+                        decision="INVALID_REQUEST",
                         allowed=False,
                         decision_code="DENIED_MISSING_REQUIRED_ARGUMENT",
-                        reason=f"Missing required parameter '{req}' for tool '{tool_name}'.",
-                        tool_name=tool_name,
-                        user_role=user_role,
+                        policy_id="POL-SCHEMA-REQUIRED",
+                        reason=f"Missing required parameter '{req}' for tool '{action}'.",
+                        subject=subject_record,
+                        action=action,
+                        resource=resource,
+                        context=context,
                         timestamp=timestamp,
                         details={"missing_param": req}
                     )
-                val = tool_args[req]
+                val = arguments[req]
                 if isinstance(val, str) and not val.strip():
                     return PolicyDecision(
+                        decision="INVALID_REQUEST",
                         allowed=False,
                         decision_code="DENIED_EMPTY_PARAMETER",
+                        policy_id="POL-SCHEMA-NONEMPTY",
                         reason=f"Parameter '{req}' cannot be empty.",
-                        tool_name=tool_name,
-                        user_role=user_role,
+                        subject=subject_record,
+                        action=action,
+                        resource=resource,
+                        context=context,
                         timestamp=timestamp,
                         details={"parameter": req}
                     )
 
             # Check for unexpected parameters
             all_allowed_params = set(schema["required"]) | set(schema.get("optional", []))
-            for arg_k in tool_args.keys():
+            for arg_k in arguments.keys():
                 if arg_k not in all_allowed_params:
                     return PolicyDecision(
+                        decision="INVALID_REQUEST",
                         allowed=False,
                         decision_code="DENIED_UNEXPECTED_ARGUMENT",
+                        policy_id="POL-SCHEMA-EXTRA-KEYS",
                         reason=f"Unexpected parameter '{arg_k}' rejected by schema policy.",
-                        tool_name=tool_name,
-                        user_role=user_role,
+                        subject=subject_record,
+                        action=action,
+                        resource=resource,
+                        context=context,
                         timestamp=timestamp,
                         details={"unexpected_param": arg_k}
                     )
 
-            # Check parameter types and string lengths
+            # Check parameter types and length bounds
             for param, expected_type in schema["types"].items():
-                if param in tool_args:
-                    val = tool_args[param]
+                if param in arguments:
+                    val = arguments[param]
                     if not isinstance(val, expected_type):
                         return PolicyDecision(
+                            decision="INVALID_REQUEST",
                             allowed=False,
                             decision_code="DENIED_TYPE_MISMATCH",
+                            policy_id="POL-SCHEMA-TYPE",
                             reason=f"Parameter '{param}' expected {expected_type}, received {type(val)}.",
-                            tool_name=tool_name,
-                            user_role=user_role,
+                            subject=subject_record,
+                            action=action,
+                            resource=resource,
+                            context=context,
                             timestamp=timestamp,
                             details={"param": param, "val": str(val)}
                         )
@@ -199,74 +259,159 @@ class SecurityPolicyEngine:
                         max_len = schema.get("max_len", {}).get(param, 500)
                         if len(val) > max_len:
                             return PolicyDecision(
+                                decision="INVALID_REQUEST",
                                 allowed=False,
                                 decision_code="DENIED_PARAMETER_LENGTH_EXCEEDED",
+                                policy_id="POL-SCHEMA-MAXLEN",
                                 reason=f"Parameter '{param}' exceeds maximum length of {max_len}.",
-                                tool_name=tool_name,
-                                user_role=user_role,
+                                subject=subject_record,
+                                action=action,
+                                resource=resource,
+                                context=context,
                                 timestamp=timestamp,
                                 details={"param": param, "length": len(val), "max": max_len}
                             )
 
-        # 5. Role-Based Access Control (RBAC)
-        if not RolePermissionMatrix.is_tool_permitted(user_role, tool_name):
+        # ---------------------------------------------------------
+        # Check 5: Role-Based Access Control (RBAC)
+        # ---------------------------------------------------------
+        if not RolePermissionMatrix.is_tool_permitted(user_role, action):
             return PolicyDecision(
+                decision="DENY",
                 allowed=False,
                 decision_code="DENIED_RBAC_UNAUTHORIZED",
-                reason=f"Role '{user_role}' is not authorized to execute '{tool_name}'.",
-                tool_name=tool_name,
-                user_role=user_role,
+                policy_id="POL-RBAC-001",
+                reason=f"Role '{user_role}' is not authorized to execute operation '{action}'.",
+                subject=subject_record,
+                action=action,
+                resource=resource,
+                context=context,
                 timestamp=timestamp,
-                details={"user_role": user_role, "required_tool": tool_name}
+                details={"user_role": user_role, "required_tool": action}
             )
 
-        # 6. Resource-Level Access Control (RLAC)
-        resource_id = tool_args.get("document_id") or tool_args.get("table") or tool_args.get("record_id")
-        if resource_id:
-            classification = RESOURCE_CLASSIFICATION.get(str(resource_id), "INTERNAL")
-            # If query or doc contains sensitive keywords
-            if any(k in str(resource_id).lower() for k in ["confidential", "credential", "payroll", "secret", "restricted"]):
-                classification = "CONFIDENTIAL"
+        # ---------------------------------------------------------
+        # Check 6: Resource-Level Access Control (RLAC Default-Deny)
+        # ---------------------------------------------------------
+        resolved_resource = resource or arguments.get("document_id") or arguments.get("table") or arguments.get("record_id")
+        
+        if resolved_resource:
+            res_str = str(resolved_resource).strip()
+            
+            # Fail-Closed Rule (SEC-01): Unknown resources MUST be denied by default!
+            if res_str not in RESOURCE_REGISTRY:
+                return PolicyDecision(
+                    decision="DENY",
+                    allowed=False,
+                    decision_code="DENIED_UNKNOWN_RESOURCE",
+                    policy_id="POL-RLAC-DEFAULT-DENY",
+                    reason=f"Resource '{res_str}' is not registered in the resource catalog and is denied by default (Fail-Closed).",
+                    subject=subject_record,
+                    action=action,
+                    resource=res_str,
+                    context=context,
+                    timestamp=timestamp,
+                    details={"resource": res_str, "status": "unregistered"}
+                )
+
+            classification = RESOURCE_REGISTRY[res_str]
 
             if not RolePermissionMatrix.is_resource_permitted(user_role, classification):
                 return PolicyDecision(
+                    decision="DENY",
                     allowed=False,
                     decision_code="DENIED_RLAC_UNAUTHORIZED",
-                    reason=f"Role '{user_role}' lacks clearance for resource '{resource_id}' ({classification}).",
-                    tool_name=tool_name,
-                    user_role=user_role,
+                    policy_id="POL-RLAC-CLEARANCE",
+                    reason=f"Role '{user_role}' lacks clearance for resource '{res_str}' ({classification}).",
+                    subject=subject_record,
+                    action=action,
+                    resource=res_str,
+                    context=context,
                     timestamp=timestamp,
-                    details={"resource_id": resource_id, "classification": classification}
+                    details={"resource_id": res_str, "classification": classification, "user_role": user_role}
                 )
 
-        # 7. Check for injection markers in arguments (Taint Analysis)
-        for k, v in tool_args.items():
+        # ---------------------------------------------------------
+        # Check 7: Dynamic Taint Propagation Check (SEC-03)
+        # ---------------------------------------------------------
+        is_tainted, taint_reason = TaintTracker.is_tainted_by_untrusted_source(action, arguments, untrusted_sources)
+        if is_tainted:
+            return PolicyDecision(
+                decision="DENY",
+                allowed=False,
+                decision_code="DENIED_TAINT_PROPAGATION",
+                policy_id="POL-TAINT-001",
+                reason=f"Adversarial taint propagation detected: {taint_reason}",
+                subject=subject_record,
+                action=action,
+                resource=resolved_resource,
+                context=context,
+                timestamp=timestamp,
+                details={"taint_reason": taint_reason}
+            )
+
+        # Static argument marker check
+        for k, v in arguments.items():
             if isinstance(v, str):
                 injections = TaintTracker.scan_for_injection_markers(v)
                 if injections:
                     return PolicyDecision(
+                        decision="DENY",
                         allowed=False,
                         decision_code="DENIED_TAINTED_ARGUMENT",
+                        policy_id="POL-TAINT-002",
                         reason=f"Adversarial injection tokens detected in parameter '{k}': {injections}",
-                        tool_name=tool_name,
-                        user_role=user_role,
+                        subject=subject_record,
+                        action=action,
+                        resource=resolved_resource,
+                        context=context,
                         timestamp=timestamp,
                         details={"param": k, "markers": injections}
                     )
 
-        # 8. All security checks passed
+        # ---------------------------------------------------------
+        # All Invariants Satisfied: ALLOW
+        # ---------------------------------------------------------
         return PolicyDecision(
+            decision="ALLOW",
             allowed=True,
             decision_code="ALLOWED",
-            reason=f"Operation '{tool_name}' verified against all security invariants.",
-            tool_name=tool_name,
-            user_role=user_role,
+            policy_id="POL-ALLOW-STANDARD",
+            reason=f"Operation '{action}' verified against all security invariants.",
+            subject=subject_record,
+            action=action,
+            resource=resolved_resource,
+            context=context,
             timestamp=timestamp,
-            details={"user_role": user_role, "tool_args": tool_args}
+            details={"user_role": user_role, "arguments": arguments}
+        )
+
+    def evaluate(
+        self,
+        tool_name: Optional[str],
+        tool_args: Dict[str, Any],
+        session_context: Optional[Dict[str, Any]] = None,
+        state_history: Optional[List[Dict[str, Any]]] = None,
+        untrusted_sources: Optional[List[str]] = None
+    ) -> PolicyDecision:
+        """Evaluates tool invocation candidate, maintaining compatibility with LangGraph node."""
+        session_context = session_context or {}
+        subject = {
+            "user_role": session_context.get("user_role", self.default_role),
+            "user_id": session_context.get("user_id", "session_user_01")
+        }
+        resource = tool_args.get("document_id") or tool_args.get("table") or tool_args.get("record_id")
+        return self.authorize(
+            subject=subject,
+            action=tool_name,
+            resource=resource,
+            context=session_context,
+            arguments=tool_args,
+            untrusted_sources=untrusted_sources
         )
 
 
-# Global policy engine instance
+# Global policy engine singleton
 policy_engine = SecurityPolicyEngine()
 
 
@@ -276,8 +421,7 @@ def authorize_tool(
     session_context: Optional[Dict[str, Any]] = None
 ) -> bool:
     """
-    Standard interface for tool authorization returning boolean decision.
-    Maintains backward compatibility with legacy calls.
+    Standard backward-compatible boolean authorization check.
     """
     decision = policy_engine.evaluate(tool_name, arguments, session_context)
     return decision.allowed

@@ -14,6 +14,7 @@ class AgentState(TypedDict, total=False):
 
     # Untrusted data & taint tracking
     untrusted_context_sources: List[str]
+    untrusted_provenance: List[Dict[str, Any]]
     taint_detected: bool
 
     # Model planning & reasoning

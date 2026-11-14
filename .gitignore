@@ -6,7 +6,7 @@ token.json
 *.key
 
 # Temporary Build / Maintenance Scripts
-build_commit_history.py
+
 build_*.py
 
 # Python & Caches
