@@ -4,10 +4,13 @@
 [![LangGraph](https://img.shields.io/badge/Orchestration-LangGraph-orange.svg)](https://github.com/langchain-ai/langgraph)
 [![Tests Passing](https://img.shields.io/badge/tests-76%2F76%20passing-brightgreen.svg)](AgentShield/tests/)
 [![Security Benchmark](https://img.shields.io/badge/Benchmark-36%20Scenarios-red.svg)](AgentShield/datasets/adversarial/)
+[![HF Models](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models%20Collection-yellow)](https://huggingface.co/collections/Anmol2507/agentshield-models-collection-6af98018b216382e742d42ba)
+[![HF Datasets](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Datasets%20Collection-blue)](https://huggingface.co/collections/Anmol2507/agentshield-datasets-collection-6af9800a7256661d479b5372)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](AgentShield/LICENSE)
 
 > **Lexsi AI Safety Hackathon (Track 2a, Problem Statement 2a.3)**  
-> **Primary Objective:** Build an AI agent security auditing and enforcement framework that prevents unauthorized actions under realistic multi-turn agent attacks while preserving legitimate task completion.
+> **Primary Objective:** Build an AI agent security auditing and enforcement framework that prevents unauthorized actions under realistic multi-turn agent attacks while preserving legitimate task completion.  
+> **Full Research Write-Up:** [**FINAL_HACKATHON_SUBMISSION.md**](AgentShield/reports/FINAL_HACKATHON_SUBMISSION.md) | **Submission Abstract:** [**ABSTRACT.md**](AgentShield/reports/ABSTRACT.md)
 
 ---
 
@@ -15,8 +18,8 @@
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/your-org/AgentShield.git
-cd AgentShield-Auth
+git clone https://github.com/AnmolRajpoot25/Agentshield_development-.git
+cd Agentshield_development-
 
 # 2. Create virtual environment & install dependencies
 python -m venv venv
@@ -36,6 +39,9 @@ python -m AgentShield.src.evaluation.runner --mode agentshield
 
 | Guide | Description | Path |
 |:---|:---|:---|
+| **Research Paper & Write-Up** | Comprehensive hackathon research paper, methodology, and findings | [AgentShield/reports/FINAL_HACKATHON_SUBMISSION.md](AgentShield/reports/FINAL_HACKATHON_SUBMISSION.md) |
+| **Submission Abstract** | 404-word official hackathon submission abstract | [AgentShield/reports/ABSTRACT.md](AgentShield/reports/ABSTRACT.md) |
+| **Submission Links Registry** | Verified repository, collection, and dataset links | [AgentShield/reports/FINAL_SUBMISSION_LINKS.md](AgentShield/reports/FINAL_SUBMISSION_LINKS.md) |
 | **System Architecture** | Protected execution boundary, node specifications, Mermaid flow | [AgentShield/docs/ARCHITECTURE.md](AgentShield/docs/ARCHITECTURE.md) |
 | **Installation Guide** | Clean OS setup, CPU vs. GPU, offline vs. online mode | [AgentShield/docs/INSTALLATION.md](AgentShield/docs/INSTALLATION.md) |
 | **Training & Calibration** | DistilBERT Guard classifier training, threshold calibration, inference | [AgentShield/docs/TRAINING.md](AgentShield/docs/TRAINING.md) |
