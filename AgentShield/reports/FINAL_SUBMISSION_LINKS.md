@@ -50,3 +50,4 @@ In controlled comparative experiments across four architectural configurations, 
 
 Our findings demonstrate that statistical guardrails and LLM prompt restrictions are inherently insufficient for agent safety. Provable agent containment requires independent, deterministic policy enforcement operating as a hard execution gate. All source code, benchmarks, checkpoints, and 76 automated regression tests are open-sourced under Apache 2.0 and MIT licenses.
 ```
+

@@ -68,3 +68,4 @@ Each log line represents an immutable event:
 - **Zero Private Credentials:** All traces were generated against synthetic corporate databases (`users`, `invoices`, `audit_logs`).
 - **Secret Redaction:** Any sensitive tokens, master API keys, or passwords appearing in prompts or responses are automatically sanitized and replaced with `[REDACTED_SECRET]`.
 - **Purpose:** Enables security researchers to inspect agent decision chains and policy engine enforcement behavior in full detail.
+

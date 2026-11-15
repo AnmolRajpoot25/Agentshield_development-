@@ -46,3 +46,4 @@ During our milestone progression, early exploratory scripts reported preliminary
 1. **Test Suite Count:** Early documentation noted 22 tests. Reconciled: 76 unit, integration, property, and regression tests implemented across 11 test files in Milestone 6 (`100% pass rate in 20.90s`).
 2. **Benchmark Scenario Count:** Early seed experiments evaluated 10 scenarios. Reconciled: Canonical benchmark (`benchmark_v4.jsonl`) evaluates 46 total scenarios (36 attack episodes + 10 benign control tasks, 96 interaction turns) as verified in `results/experiment_metadata.json`.
 3. **Guard Threshold:** Early default was $\tau = 0.50$. Reconciled: Calibrated high-precision threshold $\tau = 0.65$ was established during Milestone 3 evaluation to eliminate false alarms on corporate validation data.
+

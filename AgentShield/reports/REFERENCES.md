@@ -72,3 +72,4 @@
 | **Single-Turn Input Filters** | Llama Guard, NeMo Guardrails | Binary classification of raw user prompt text | Fails when attacks are distributed gradually across multiple turns. | **Multi-Turn Context & Taint:** Tracks provenance and flags intent across turns and retrieved docs. |
 | **Output Token Classifiers** | OpenAI Moderation API | Post-generation safety filtering | Tool call parameters are already dispatched before output text is rendered. | **Pre-Execution Gate:** Policy Engine intercepts action proposals **before** tool dispatch. |
 | **Static Tool Allowlisting** | ReAct / Tool Use Paradigms | Global list of available tools | Cannot prevent an authorized user from performing an unauthorized action on sensitive resources. | **Fine-Grained RBAC + RLAC:** Enforces user clearance and data sensitivity limits per operation. |
+

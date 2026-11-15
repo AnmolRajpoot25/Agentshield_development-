@@ -8,6 +8,27 @@
 
 ---
 
+> [!WARNING]
+> **CONTENT WARNING:**  
+> This paper contains synthetic examples of adversarial prompts, multi-turn jailbreaks (e.g. DAN mode, persona drift), indirect prompt injections, and simulated privilege escalation attempts. All examples are synthetic evaluation artifacts designed strictly for defensive security research and execute against in-memory sandboxes with zero operational real-world exploits.
+
+---
+
+## ⚡ Quick Summary for Reviewers
+
+- **Tracks & Problem Statements:** Track 2a (Agentic AI Safety & Security), Problem Statement 2a.3 (Multi-turn Agent Guardrails, Tool-Use Containment & Adversarial Audit).
+- **Headline Before → After:** **Attack Success Rate (ASR): 61.1% → 0.0%** ($p < 0.001$); **Unauthorized Execution Rate (UER): 63.9% → 0.0%**; **Benign Task Utility: 100.0%** preserved.
+- **Base Model + Method in One Line:** `distilbert-base-uncased` multi-task intent classification paired with a deterministic external RBAC/RLAC policy execution gate.
+
+> [!IMPORTANT]
+> ### ⏱️ "For Judges: One Minute" Box
+> 1. **The Core Vulnerability:** Tool-using AI agents fail under multi-turn attacks because cognitive planning is conflated with execution authority. Prompt-level guardrails and model-level classifiers cannot prevent attacks when adversaries control context or retrieved documents.
+> 2. **The AgentShield Fix:** Establish a zero-trust protected execution boundary: `User Request → Planner → Guard → Policy Engine → Protected Executor → Audit`. The LLM planner proposes actions with **zero authority**; an independent, deterministic Security Policy Engine enforces RBAC, default-deny RLAC, and dynamic taint tracking.
+> 3. **The Key Finding:** Model Guard alone yields **61.1% ASR** (statistical guardrails cannot enforce policies). Combined AgentShield reduces ASR to **0.0%** across 36 multi-turn scenarios with **100% benign utility** and sub-0.1 ms latency overhead.
+> 4. **Artifacts Ready:** 76 automated regression tests (100% pass rate), 3 Hugging Face datasets, 1 Hugging Face model repository, and complete reproduction guides.
+
+---
+
 ## 1. Project Overview & One-Line Contribution
 
 > **One-Line Technical Contribution:**  
@@ -366,7 +387,33 @@ Security Core Coverage:   93.1% average across security enforcement modules
 
 ---
 
-## 14. Master Research Artifact Index
+## 14. With More Credits: Planned Scaling & Future Approach
+
+- **Planned Approach:** With additional compute and cloud credits, we plan to:
+  1. Scale the Guard classifier from DistilBERT to fine-tuned foundation models (e.g. Llama-3.1-8B, Aya-23-8B) with FlashAttention-2 to detect complex semantic multi-turn jailbreaks across 20+ natural languages.
+  2. Implement kernel-level eBPF sandboxing to enforce execution containment on operating system processes and network sockets.
+  3. Expand the benchmark to 500+ diverse multi-agent collaboration topologies (hierarchical swarms, peer review networks).
+- **Expected Before → After:**
+  - Extended multi-lingual attack coverage (expanding from English enterprise workflows to 15+ low-resource languages).
+  - Formal cryptographic verification of taint propagation paths across distributed microservices.
+
+---
+
+## 15. Declaration of Work Done Outside the Hackathon
+
+- **Work Period:** All core research, security architecture, Guard classifier training, benchmark synthesis, comparative experiments, and automated testing were developed specifically during the Lexsi AI Safety Hackathon period (clean Git commit history beginning November 6, 2026).
+- **Pre-Existing Components:** Standard public open-source libraries (LangGraph, PyTorch, Transformers, Scikit-Learn) and base pretrained weights (`distilbert-base-uncased`). Zero proprietary corporate code was imported.
+
+---
+
+## 16. Author Contributions & LLM Usage Statement
+
+- **Sole Author & Maintainer:** Anmol Rajpoot (`rajpootanmol779@gmail.com`) — Conceptualization, security architecture design, policy engine implementation, ML training pipeline, benchmark scenario creation, comparative experimentation, and manuscript write-up.
+- **LLM Assistance Disclosure:** LLM assistance (Claude / Gemini via Antigravity environment) was utilized for code scaffolding, drafting unit test fixtures, generating boilerplate documentation, and editorial formatting of reports. All security logic, mathematical proofs, experimental data, and empirical findings were designed, reviewed, executed, and verified by the human author.
+
+---
+
+## 17. Master Research Artifact Index
 
 All supporting artifacts are packaged locally and indexed:
 
@@ -384,6 +431,7 @@ All supporting artifacts are packaged locally and indexed:
 
 ---
 
-## 15. Conclusion
+## 18. Conclusion
 
 AgentShield demonstrates both theoretically and empirically that prompt-based guardrails and model-level intent classifiers are insufficient on their own to guarantee agent safety. When cognitive planners are decoupled from authorization authority and constrained by an independent, deterministic Security Policy Engine, multi-turn tool-using agents achieve complete containment against adversarial attacks without sacrificing legitimate task completion.
+

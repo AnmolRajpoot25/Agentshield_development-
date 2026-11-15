@@ -176,3 +176,4 @@ for config, metrics in d['configurations'].items():
 ### Step 9: Limitations & Ethical Scope (30 seconds)
 - **Scope:** In-memory synthetic databases enable deterministic state audits; real-world environments require credential integration.
 - **Takeaway:** Prompt restrictions and model guardrails fail when attackers control context. Provable agent containment requires deterministic external policies.
+
