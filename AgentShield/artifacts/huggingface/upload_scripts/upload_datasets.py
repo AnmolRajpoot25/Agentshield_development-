@@ -12,6 +12,14 @@ import sys
 import argparse
 from pathlib import Path
 
+try:
+    from dotenv import load_dotenv
+    # Search root and local .env
+    load_dotenv()
+    load_dotenv(Path(__file__).resolve().parent.parent.parent.parent / ".env")
+except ImportError:
+    pass
+
 # Paths
 HF_BASE = Path(__file__).resolve().parent.parent
 HF_DATASETS_DIR = HF_BASE / "datasets"
