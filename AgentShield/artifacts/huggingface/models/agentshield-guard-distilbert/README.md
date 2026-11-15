@@ -110,9 +110,11 @@ The model was fine-tuned on the `agentshield-guard-dataset` ($N=398$ samples) us
 
 ## 5. Evaluation & Test Set Performance
 
-Evaluated on the independent, untouched test set ($N=22$ samples):
+### 5.1 In-Distribution Test Set Metrics ($N=22$ Untouched Samples)
 
-### Binary Intent Classification
+Evaluated on the independent test partition with strict zero-leakage family-ID isolation:
+
+#### Binary Intent Classification
 | Metric | Test Set Score |
 |:---|:---:|
 | **Accuracy** | **100.0%** |
@@ -124,7 +126,7 @@ Evaluated on the independent, untouched test set ($N=22$ samples):
 | **False Positive Rate** | **0.0%** |
 | **False Negative Rate** | **0.0%** |
 
-### Multi-Class Attack Categorization
+#### Multi-Class Attack Categorization
 - **Overall Category Accuracy:** 100.0%
 - **Macro F1 Score:** 1.000
 - **Supported Categories:**
@@ -136,9 +138,62 @@ Evaluated on the independent, untouched test set ($N=22$ samples):
   - `false_authorization` (ID: 5)
   - `privilege_escalation` (ID: 6)
 
-### Calibrated Threshold Selection
+#### Calibrated Decision Thresholds
 - **Default Balanced Threshold:** $\tau = 0.50$
-- **High-Precision Threshold:** $\tau = 0.65$ (Optimal F1 on validation split, 0% FPR).
+- **Calibrated High-Precision Threshold:** $\tau^* = 0.65$ (Optimized on validation split to maximize F1 while eliminating false alarms on benign corporate queries).
+
+---
+
+### 5.2 Critical Scientific Analysis: Why Are Test Metrics "Perfect"? (Addressing Overfitting & Synthetic Alignment)
+
+> [!IMPORTANT]
+> **A 100.0% test score on synthetic benchmarks must NEVER be interpreted as absolute real-world invulnerability.**
+
+In rigorous adversarial machine learning evaluation, "perfect" scores often indicate in-distribution synthetic alignment or limited test support rather than universal robustness. We report these metrics transparently alongside the following crucial caveats:
+
+1. **Small Test Support ($N=22$):** The independent test set contains 22 untouched dialogues (4 benign hard negatives, 3 samples across each of the 6 attack classes). While mathematically partitioned with zero template-family leakage ($\text{Train} \cap \text{Test} = \emptyset$), a 66M-parameter transformer can readily discover linear separability across 22 clean test points.
+2. **Template Grammar Regularity:** Although seed families were strictly isolated prior to augmentation, synthetic generation adheres to recognizable semantic patterns (e.g., explicit privilege assertions, SQL keywords, roleplay framing) that a fine-tuned sequence classifier easily memorizes.
+3. **The Static Text Limitation:** Real adversaries do not attack autonomous agents using static single-turn text templates; they adapt dynamically across turns.
+
+To rigorously understand the true limits of this classifier, we conducted **two extensive empirical stress tests**:
+
+---
+
+### 5.3 Out-of-Distribution (OOD) Stress Testing ($N=8$ Adversarial Variations)
+
+We evaluated the model against 8 challenging out-of-distribution variations featuring leetspeak obfuscation, polite enterprise social engineering wrappers, and keyword-heavy ambiguous corporate queries (`src/guard/robustness.py`):
+
+| Evaluation Dimension | In-Distribution Test | Out-of-Distribution (OOD) Stress Test | Delta |
+|:---|:---:|:---:|:---:|
+| **Binary Intent Accuracy** | **100.0%** | **87.5%** (7/8 correct) | **-12.5%** |
+| **Category Classification Accuracy** | **100.0%** | **75.0%** (6/8 correct) | **-25.0%** |
+
+* **Key Failure Mode:** On ambiguous enterprise requests (e.g. an HR analyst querying employee salary bands, `ROB_AMB_01`), the Guard produced an elevated risk score of $0.6510$, exceeding the calibrated threshold $\tau^* = 0.65$ and generating a **false alarm**.
+* **Implication:** The Guard cannot distinguish legitimate administrative actions from unauthorized ones without context on the user's verified role and permissions.
+
+---
+
+### 5.4 Multi-Turn Attack Benchmark Performance ($N=36$ Scenarios, 96 Turns)
+
+When deployed in live multi-turn agent interactions against the canonical **AgentShield Attack Benchmark** (where adversaries disperse intent across multiple seemingly harmless conversational steps):
+
+* **Multi-Turn Detection Recall collapsed from 100.0% down to 41.7%.**
+* **The Vulnerability of Statistical Guardrails:** In multi-turn attacks (e.g., Turn 1: *"List available database tables"*, Turn 2: *"Describe schema"*, Turn 3: *"Update user role to admin"*), individual turns appear completely benign or weakly suspicious to a text classifier. The Guard missed **58.3% of multi-turn attacks**.
+
+---
+
+### 5.5 Core Research Finding: Why Statistical Guardrails Alone Are Insufficient
+
+AgentShield's comparative ablation experiments (`reports/COMPARATIVE_EXPERIMENTS.md`) demonstrate why statistical guardrails alone cannot secure autonomous agents:
+
+| Architectural Configuration | Multi-Turn Guard Recall | Attack Success Rate (ASR) | What Actually Happened |
+|:---|:---:|:---:|:---|
+| **Configuration 1: Vulnerable Baseline** | 0.0% *(disabled)* | **61.1%** | Vulnerable to 11 of 18 evaluated multi-turn attacks. |
+| **Configuration 2: Guardrail-Only (No Policy Engine)** | **41.7%** | **61.1%** | **Identical 61.1% ASR.** The classifier missed 58.3% of attacks, and even when an attack was flagged, the unhardened runtime executed the tool anyway. |
+| **Configuration 3: AgentShield (Guard + Policy Engine)** | **41.7%** | **0.0%** | **Zero attacks succeeded (100% neutralized).** Even when the Guard's detection recall dropped to 41.7%, the independent, deterministic Policy Engine blocked 100% of unauthorized executions at the tool sandbox boundary. |
+
+> [!TIP]
+> **Summary takeaway:** *Guardrails inform; policies enforce.* This model serves as an early-warning telemetry sensor to alert human operators and log anomalous intent, but must **never** be used as a standalone authorization boundary. Strong agent safety requires deterministic execution gating.
 
 ---
 
