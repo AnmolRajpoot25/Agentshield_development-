@@ -71,34 +71,22 @@ This report verifies that all candidate Hugging Face datasets and model artifact
 
 ---
 
-## 4. Collection Metadata
+## 4. Live Published Collections & Repositories
 
-- **Collection Title:** `AgentShield — AI Agent Security Evaluation`
-- **Collection Slug:** `agentshield-ai-agent-security-evaluation`
-- **Metadata File:** `AgentShield/artifacts/huggingface/collections/collection_metadata.json`
-- **Organization:** Links 1 model repository and 3 dataset repositories into a single public hub.
+- **Hugging Face Datasets Collection:** [https://huggingface.co/collections/Anmol2507/agentshield-datasets-collection-6af9800a7256661d479b5372](https://huggingface.co/collections/Anmol2507/agentshield-datasets-collection-6af9800a7256661d479b5372)
+  - `Anmol2507/agentshield-guard-dataset`
+  - `Anmol2507/agentshield-attack-benchmark`
+  - `Anmol2507/agentshield-synthetic-traces`
+- **Hugging Face Models Collection:** [https://huggingface.co/collections/Anmol2507/agentshield-models-collection-6af98018b216382e742d42ba](https://huggingface.co/collections/Anmol2507/agentshield-models-collection-6af98018b216382e742d42ba)
+  - `Anmol2507/agentshield-guard-distilbert`
+- **Status:** **PUBLISHED & PUBLIC (VERIFIED)**.
 
 ---
 
-## 5. Step-by-Step Instructions for Manual Hugging Face Publish
+## 5. Verification & Access Audit
 
-When the participant is ready to publish to Hugging Face:
-
-```bash
-# 1. Install huggingface_hub CLI (if not already installed)
-pip install huggingface_hub
-
-# 2. Login to your Hugging Face account (or set HF_TOKEN environment variable)
-huggingface-cli login
-# Or in PowerShell: $env:HF_TOKEN = "hf_your_token_here"
-# Or in Bash:       export HF_TOKEN="hf_your_token_here"
-
-# 3. Publish Datasets (Runs upload_datasets.py with --publish flag)
-python AgentShield/artifacts/huggingface/upload_scripts/upload_datasets.py --publish
-
-# 4. Publish Model (Runs upload_models.py with --publish flag)
-python AgentShield/artifacts/huggingface/upload_scripts/upload_models.py --publish
-```
-
-*(Note: Per constraints, the AI assistant will NOT execute these upload commands automatically).*
+All repositories and collections have been created and published publicly on Hugging Face Hub under the account `Anmol2507`:
+- All individual repositories are un-gated and publicly accessible.
+- Both collections are public (`private: False`).
+- SHA-256 and byte sizes match local source artifacts.
 

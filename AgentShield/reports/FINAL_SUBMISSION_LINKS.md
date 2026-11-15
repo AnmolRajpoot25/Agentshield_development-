@@ -24,11 +24,12 @@
 | Artifact Name | Platform / Type | Submission URL / Location | Status |
 |:---|:---|:---|:---:|
 | **Public GitHub Repository** | Source Code & Tests | `https://github.com/Anmol2507/AgentShield` | `PENDING_USER_PUSH` |
-| **Hugging Face Dataset Collection** | Datasets & Benchmarks | `https://huggingface.co/collections/Anmol2507/agentshield-ai-agent-security-evaluation` | `READY_FOR_UPLOAD` |
-| **Guard Dataset Repository** | Hugging Face Dataset | `https://huggingface.co/datasets/Anmol2507/agentshield-guard-dataset` | `READY_FOR_UPLOAD` |
-| **Attack Benchmark Repository** | Hugging Face Dataset | `https://huggingface.co/datasets/Anmol2507/agentshield-attack-benchmark` | `READY_FOR_UPLOAD` |
-| **Execution Traces Repository** | Hugging Face Dataset | `https://huggingface.co/datasets/Anmol2507/agentshield-synthetic-traces` | `READY_FOR_UPLOAD` |
-| **Guard Model Repository** | Hugging Face Model | `https://huggingface.co/models/Anmol2507/agentshield-guard-distilbert` | `READY_FOR_UPLOAD` |
+| **Hugging Face Dataset Collection** | Datasets & Benchmarks | `https://huggingface.co/collections/Anmol2507/agentshield-datasets-collection-6af9800a7256661d479b5372` | **PUBLISHED & PUBLIC** |
+| **Hugging Face Model Collection** | Guardrail Models | `https://huggingface.co/collections/Anmol2507/agentshield-models-collection-6af98018b216382e742d42ba` | **PUBLISHED & PUBLIC** |
+| **Guard Dataset Repository** | Hugging Face Dataset | `https://huggingface.co/datasets/Anmol2507/agentshield-guard-dataset` | **PUBLISHED & PUBLIC** |
+| **Attack Benchmark Repository** | Hugging Face Dataset | `https://huggingface.co/datasets/Anmol2507/agentshield-attack-benchmark` | **PUBLISHED & PUBLIC** |
+| **Execution Traces Repository** | Hugging Face Dataset | `https://huggingface.co/datasets/Anmol2507/agentshield-synthetic-traces` | **PUBLISHED & PUBLIC** |
+| **Guard Model Repository** | Hugging Face Model | `https://huggingface.co/Anmol2507/agentshield-guard-distilbert` | **PUBLISHED & PUBLIC** |
 | **Research Submission Paper** | Markdown / Report | `AgentShield/reports/FINAL_HACKATHON_SUBMISSION.md` (or GitHub blob link) | **READY ON DISK** |
 | **Submission Abstract** | Markdown / Text | `AgentShield/reports/ABSTRACT.md` | **READY ON DISK** |
 | **Demonstration Walkthrough** | Script / Video Plan | `AgentShield/reports/DEMO_SCRIPT.md` | **READY ON DISK** |
